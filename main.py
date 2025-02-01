@@ -15,7 +15,7 @@ import datetime
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
-
+from pymongo.server_api import ServerApi
 # Helper functions
 def adjust_risk_score(transaction, risk_score):
     if transaction['amount'] > 1000000:  # Extremely high amount
@@ -35,10 +35,17 @@ def is_valid_ip(ip):
 
 # Initialize FastAPI and MongoDB
 app = FastAPI(title="KAIRO")
-client = MongoClient("mongodb://localhost:27017")
-db = client['fraud-detection']
+print("DBCONNECT")
+uri = "mongodb+srv://dawdameet6338:ptsMMO0z8GtG3GsY@kairocluster.mhycn.mongodb.net/?retryWrites=true&w=majority&appName=kairocluster"
+# Create a new client and connect to the server
+client = MongoClient(uri, server_api=ServerApi('1'))
+db = client['fraud-detection-db']
 fs = gridfs.GridFS(db)
-
+try:
+    client.admin.command('ping')
+    print("Pinged your deployment. You successfully connected to MongoDB!")
+except Exception as e:
+    print(e)
 # Data preprocessing functions
 def encode_categorical_columns(df):
     label_encoders = {}
